@@ -1,0 +1,76 @@
+---
+version: 2.1
+
+clone_ecommerce: &clone_ecommerce
+  run:
+    name: Clone ecommerce
+    command: |
+      cd
+      git clone --single-branch --branch josh/bb-3315-pluggable-backends-koa https://github.com/open-craft/ecommerce.git
+
+install_ecommerce_requirements: &install_ecommerce_requirements
+  run:
+    name: Install ecommerce requirements
+    command: |
+      cd ~/ecommerce
+      virtualenv -p python3.8 venv
+      . venv/bin/activate
+      pip3 install -r requirements/dev.txt
+jobs:
+  run_quality:
+    docker:
+      - image: cimg/python:3.8
+    steps:
+      - checkout
+      - *clone_ecommerce
+      - restore_cache:
+          key: py-{{ checksum "../ecommerce/requirements/dev.txt" }}
+      - *install_ecommerce_requirements
+      - save_cache:
+          key: py-{{ checksum "../ecommerce/requirements/dev.txt" }}
+          paths:
+            - "../ecommerce/venv"
+      - run:
+          name: Run code quality checks
+          command: |
+            cd ~/ecommerce
+            . venv/bin/activate
+            cd ~/project
+            isort --check-only --recursive -w 120
+            PYTHONPATH="$PYTHONPATH:../ecommerce" pylint -j 0 --rcfile=~/ecommerce/pylintrc hyperpay setup.py
+  run_tests:
+    docker:
+      - image: cimg/python:3.8-node
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_ROOT_PASSWORD: password
+    steps:
+      - checkout
+      - run:
+          name: Wait for MySQL
+          command: dockerize -wait tcp://localhost:3306 -timeout 10s
+      - *clone_ecommerce
+      - restore_cache:
+          key: py-{{ checksum "../ecommerce/requirements/dev.txt" }}
+      - *install_ecommerce_requirements
+      - save_cache:
+          key: py-{{ checksum "../ecommerce/requirements/dev.txt" }}
+          paths:
+            - "../ecommerce/venv"
+      - run:
+          name: Run unit tests
+          command: |
+            cd ~/ecommerce
+            . venv/bin/activate
+            cd ~/project
+            pip install -e .
+            cp settings/*.py ~/ecommerce/ecommerce/settings/
+            cd ~/ecommerce
+            DJANGO_SETTINGS_MODULE='ecommerce.settings.ci' pytest ~/project/hyperpay
+workflows:
+  build:
+    jobs:
+      - run_quality
+      - run_tests:
+          requires:
+            - run_quality

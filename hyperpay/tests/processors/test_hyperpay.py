@@ -60,15 +60,6 @@ class HyperPayTests(HyperPayMixin, PaymentProcessorTestCaseMixin, TestCase):
 
         return ppr.id
 
-    def test__get_basket_data(self):
-        """
-        Test the _get_basket_data() method.
-        """
-        self.assertEqual(
-            self.processor._get_basket_data(self.basket),  # pylint:disable=protected-access
-            self.DEFAULT_BASKET_DATA
-        )
-
     @responses.activate
     @patch('ecommerce.core.models.User.account_details')
     def test__get_checkout_id(self, mock_account_details):
