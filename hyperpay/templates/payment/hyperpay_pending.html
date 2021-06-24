@@ -1,0 +1,50 @@
+{% load i18n %}
+{% load static %}
+{% load compress %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="refresh" content="{{ interval }}">
+        <title>{{ title | force_escape }}</title>
+        {% compress css %}
+            {% if main_css %}
+                <link rel="stylesheet" href="{{ main_css }}" type="text/x-scss">
+            {% else %}
+                <link rel="stylesheet" href="{% static 'css/base/main.css' %}" type="text/x-scss">
+            {% endif %}
+        {% endcompress %}
+
+        {% compress css %}
+            {# This block is separated to better support browser caching. #}
+            {% block stylesheets %}
+            {% endblock %}
+        {% endcompress %}
+    </head>
+    <body>
+        <div id="skip-link">
+            <a href="#main-content" class="element-invisible element-focusable">Skip to main content</a>
+        </div>
+        {# This adds the header for the page. #}
+        {% include 'edx/partials/_student_navbar.html' %}
+        <div class="container content-wrapper receipt-cancel-error">
+            <h1>
+                {% trans "Payment transaction in progress" as tmsg %}{{ tmsg | force_escape }}
+            </h1>
+            <p>
+                {% trans "This can take up to 30 minutes and the page will automatically refresh multiple times. "  as tmsg%}
+                {{  tmsg | force_escape }}
+                 <b>{%  trans "Do not close or manually refresh this page." as tmsg %}{{ tmsg | force_escape }}</b>
+            </p>
+        </div>
+        <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+        {% compress js %}
+            <script src="{% static 'bower_components/requirejs/require.js' %}"></script>
+            <script src="{% static 'js/config.js' %}"></script>
+
+            Note: django-compressor does not recognize the data-main attribute. Load the main script separately.
+            <script src="{% static 'js/common.js' %}"></script>
+        {% endcompress %}
+    </body>
+</html>

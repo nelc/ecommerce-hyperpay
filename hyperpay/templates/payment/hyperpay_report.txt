@@ -1,0 +1,8 @@
+Following payment (Hyperpay) require manual verification/action:
+
+{% for response in responses %}
+{{ forloop.counter }}. {{ reponse.basket.status }}: {{ response.response.basket.owner.get_full_name }} {{ response.basket.owner.username }}
+{% for item in response.basket.lines.all %}
+    {{ item.product.course.id }} - {{ item.quantity }}
+{% endfor %}
+{% endfor %}

@@ -1,0 +1,61 @@
+{% load i18n %}
+{% load static %}
+{% load compress %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% trans "HyperPay" %} - {{ payment_mode }}</title>
+        {% compress css %}
+            {% if main_css %}
+                <link rel="stylesheet" href="{{ main_css }}" type="text/x-scss">
+            {% else %}
+                <link rel="stylesheet" href="{% static 'css/base/main.css' %}" type="text/x-scss">
+            {% endif %}
+        {% endcompress %}
+
+        {% compress css %}
+            {# This block is separated to better support browser caching. #}
+            {% block stylesheets %}
+            {% endblock %}
+        {% endcompress %}
+        <script src="{{ payment_widget_js }}"></script>
+        <script src="https://code.jquery.com/jquery.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var wpwlOptions = {
+              style: 'logos',
+              brandDetection: true,
+              brandDetectionType: 'binlist',
+              locale: "{{ locale }}",
+              maskCvv: true,
+              billingAddress: {},
+              mandatoryBillingFields: {
+                country: true,
+                state: true,
+                city: true,
+                postcode: true,
+                street1: true,
+                street2: false
+              }
+            }
+        </script>
+    </head>
+    <body>
+        <div id="skip-link">
+            <a href="#main-content" class="element-invisible element-focusable">Skip to main content</a>
+        </div>
+        {# This adds the header for the page. #}
+        {% include 'edx/partials/_student_navbar.html' %}
+        <form action="{{ payment_result_url }}" class="paymentWidgets" data-brands="{{ brands }}">
+        </form>
+        <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+        {% compress js %}
+            <script src="{% static 'bower_components/requirejs/require.js' %}"></script>
+            <script src="{% static 'js/config.js' %}"></script>
+
+            Note: django-compressor does not recognize the data-main attribute. Load the main script separately.
+            <script src="{% static 'js/common.js' %}"></script>
+        {% endcompress %}
+    </body>
+</html>

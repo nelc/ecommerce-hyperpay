@@ -1,0 +1,48 @@
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    td {
+        padding: 10px;
+    }
+</style>
+
+<p>Following payment (Hyperpay) require manual verification/action</p>
+
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>User Details</th>
+                <th>Basket Items</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reponse in responses %}
+                <tr>
+                    <td>
+                        <div>{{ response.basket.owner.get_full_name }}</div>
+                        <div>{{ response.basket.owner.username }}</div>
+                    </td>
+                    <td>
+                        {% for item in response.basket.lines.all %}
+                        <div>
+                            <span>{{ item.product.course.id }}</span>
+                            <span>{{ item.quantity }}</span>
+                        </div>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {{ response.basket.status }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="border-top: 1px black solid; margin-top:25px; padding: 20px; font-size: small;">
+    This is an automatically generated report. Do not reply to this email.
+</div>
