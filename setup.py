@@ -33,7 +33,7 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     install_requires=[
-        'Django~=2.2',
+        'Django~=3.2',
     ],
     packages=[
         'hyperpay',
