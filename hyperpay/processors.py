@@ -119,11 +119,11 @@ class HyperPay(BasePaymentProcessor):
         basket_data = {
             'amount': format_price(basket.total_incl_tax),
             'currency': self.currency,
-            'merchantTransactionId': basket.order_number
+            'merchantTransactionId': basket.order_number  # this needs to be cleaned from special characters, or we can do that from the ecommerce itself
         }
         for index, line in enumerate(basket.all_lines()):
             cart_item = {
-                get_cart_field(index, 'name'): clean_field_value(line.product.title),
+                get_cart_field(index, 'name'): clean_field_value(line.product.title),  # This needs to be limited to 47 characters via clean_field_value(line.product.title)[:47]
                 get_cart_field(index, 'quantity'): line.quantity,
                 get_cart_field(index, 'type'): self.CART_ITEM_TYPE_DIGITAL,
                 get_cart_field(index, 'sku'): line.stockrecord.partner_sku,
