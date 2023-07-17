@@ -119,7 +119,8 @@ class HyperPay(BasePaymentProcessor):
         basket_data = {
             'amount': format_price(basket.total_incl_tax),
             'currency': self.currency,
-            'merchantTransactionId': basket.order_number
+            'merchantTransactionId': basket.order_number.replace("-", ""),
+            'merchantMemo': basket.order_number,
         }
         for index, line in enumerate(basket.all_lines()):
             cart_item = {
