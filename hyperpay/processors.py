@@ -42,7 +42,7 @@ class HyperPay(BasePaymentProcessor):
 
     NAME = 'hyperpay'
     PAYMENT_MODE = _('Credit card')
-    PAYMENT_TYPE_DEBIT = 'DB'
+    PAYMENT_TYPE = 'CD'
     CHECKOUTS_ENDPOINT = '/v1/checkouts'
     PAYMENT_WIDGET_JS_PATH = '/v1/paymentWidgets.js'
     RESULT_CODE_SUCCESSFULLY_CREATED_CHECKOUT = '000.200.100'
@@ -141,7 +141,7 @@ class HyperPay(BasePaymentProcessor):
         checkouts_api_url = self.hyper_pay_api_base_url + self.CHECKOUTS_ENDPOINT
         request_data = {
             'entityId': self.entity_id,
-            'paymentType': self.PAYMENT_TYPE_DEBIT
+            'paymentType': self.PAYMENT_TYPE
         }
         if self.test_mode:
             request_data['testMode'] = self.test_mode
@@ -228,3 +228,4 @@ class HyperPayMada(HyperPay):
     PAYMENT_MODE = _('mada')
     BRANDS = "MADA"
     CHECKOUT_TEXT = _("Checkout with mada")
+    PAYMENT_TYPE = 'DB'
