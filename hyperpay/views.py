@@ -260,7 +260,7 @@ class HyperPayResponseView(EdxOrderPlacementMixin, View):
             if status == PaymentStatus.PENDING:
                 return self._handle_pending_status(request, encrypted_resource_path, resource_path)
 
-            basket_id = OrderNumberGenerator().basket_id(verification_response['merchantTransactionId'])
+            basket_id = OrderNumberGenerator().basket_id(verification_response['merchantMemo'])
             basket = self._get_basket(basket_id)
 
             transaction_id = verification_response['id']
