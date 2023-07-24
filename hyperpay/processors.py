@@ -42,7 +42,7 @@ class HyperPay(BasePaymentProcessor):
 
     NAME = 'hyperpay'
     PAYMENT_MODE = _('Credit card')
-    PAYMENT_TYPE = 'CD'
+    PAYMENT_TYPE = 'DB'
     CHECKOUTS_ENDPOINT = '/v1/checkouts'
     PAYMENT_WIDGET_JS_PATH = '/v1/paymentWidgets.js'
     RESULT_CODE_SUCCESSFULLY_CREATED_CHECKOUT = '000.200.100'
