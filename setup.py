@@ -1,6 +1,7 @@
 """
 Setup file for the ecommerce-hyperpay Open edX ecommerce payment processor backend plugin.
 """
+import os
 
 from pathlib import Path
 
@@ -8,6 +9,21 @@ from setuptools import setup
 
 README = open(Path(__file__).parent / 'README.rst').read()
 CHANGELOG = open(Path(__file__).parent / 'CHANGELOG.rst').read()
+
+def package_data(pkg, roots):
+    """Generic function to find package_data.
+
+    All of the files under each of the `roots` will be declared as package
+    data for package `pkg`.
+
+    """
+    data = []
+    for root in roots:
+        for dirname, _, files in os.walk(os.path.join(pkg, root)):
+            for fname in files:
+                data.append(os.path.relpath(os.path.join(dirname, fname), pkg))
+
+    return {pkg: data}
 
 
 setup(
@@ -35,6 +51,7 @@ setup(
     install_requires=[
         'Django~=3.2',
     ],
+    package_data=package_data('hyperpay', ['locale']),
     packages=[
         'hyperpay',
     ],
