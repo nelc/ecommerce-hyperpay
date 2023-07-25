@@ -1,0 +1,65 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+# Translators:
+# Johan  <johanv26>, 2023
+# NELC Open edX Translation <openedx@elc.edu.sa>, 2023
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-31 14:35+0000\n"
+"PO-Revision-Date: 2021-04-30 13:21+0000\n"
+"Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2021\n"
+"Language-Team: Arabic (https://www.transifex.com/national-center-for-e-learning-and-distance-learning/teams/118545/ar/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+#: hyperpay/processors.py:44
+msgid "Credit card"
+msgstr "بطاقة إئتمان"
+
+#: hyperpay/processors.py:53
+msgid "Checkout with credit card"
+msgstr "إدفع ببطاقة إئتمان"
+
+#: hyperpay/processors.py:229
+msgid "mada"
+msgstr "مدى"
+
+#: hyperpay/processors.py:231
+msgid "Checkout with mada"
+msgstr "إدفع ببطاقة مدى"
+
+#: hyperpay/templates/payment/hyperpay.html:9
+msgid "HyperPay"
+msgstr "هايبرباي"
+
+#: hyperpay/templates/payment/hyperpay_pending.html:33
+msgid "Payment transaction in progress"
+msgstr "يتم إجراء معاملة الدفع"
+
+#: hyperpay/templates/payment/hyperpay_pending.html:36
+msgid ""
+"This can take up to 30 minutes and the page will automatically refresh "
+"multiple times. "
+msgstr "هذه العملية قد تتطلب 30 دقيقة ولحين تمام المعاملة سيتم إعادة تحميل الصفحة تلقائياً."
+
+#: hyperpay/templates/payment/hyperpay_pending.html:38
+msgid "Do not close or manually refresh this page."
+msgstr "لا تغلق الصفحة ولا تقوم بإعادة تحميلها بنفسك."
+
+#: hyperpay/views.py:100
+msgid "HyperPay - Credit card - pending"
+msgstr "هايبرباي - بطاقة إئتمان - قيد الإنتظار"
+
+#: hyperpay/views.py:318
+msgid "HyperPay - mada - pending"
+msgstr "هايبرباي - مدى - قيد الإنتظار"
