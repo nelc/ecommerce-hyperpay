@@ -304,6 +304,7 @@ class HyperPayResponseView(EdxOrderPlacementMixin, View):
             return redirect(reverse('payment_error'))
         self.create_order(request, basket)
         receipt_url = get_receipt_page_url(
+            request=request,
             order_number=basket.order_number,
             site_configuration=basket.site.siteconfiguration
         )
