@@ -4,6 +4,14 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta http-equiv="Content-Security-Policy"
+        content="
+        style-src 'self' {{ hyper_pay_api_base_url }} 'unsafe-inline' ;
+        frame-src 'self' {{ hyper_pay_api_base_url }};
+        script-src 'self' {{ hyper_pay_api_base_url }} 'nonce-{{ nonce_id }}' ;
+        connect-src 'self' {{ hyper_pay_api_base_url }};
+        img-src 'self' {{ hyper_pay_api_base_url }};
+        ">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% trans "HyperPay" %} - {{ payment_mode }}</title>
@@ -21,8 +29,8 @@
             {% endblock %}
         {% endcompress %}
         <script src="{{ payment_widget_js }}" integrity="{{ integrity }}" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/jquery.js" type="text/javascript"></script>
-        <script type="text/javascript">
+        <script src="https://code.jquery.com/jquery.js" type="text/javascript" nonce="{{ nonce_id }}"></script>
+        <script type="text/javascript" nonce="{{ nonce_id }}">
             var wpwlOptions = {
               style: 'logos',
               brandDetection: true,
@@ -49,13 +57,13 @@
         {% include 'edx/partials/_student_navbar.html' %}
         <form action="{{ payment_result_url }}" class="paymentWidgets" data-brands="{{ brands }}">
         </form>
-        <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+        <script type="text/javascript" src="{% url 'javascript-catalog' %}" nonce="{{ nonce_id }}"></script>
         {% compress js %}
-            <script src="{% static 'bower_components/requirejs/require.js' %}"></script>
-            <script src="{% static 'js/config.js' %}"></script>
+            <script src="{% static 'bower_components/requirejs/require.js' %}" nonce="{{ nonce_id }}"></script>
+            <script src="{% static 'js/config.js' %}" nonce="{{ nonce_id }}"></script>
 
             Note: django-compressor does not recognize the data-main attribute. Load the main script separately.
-            <script src="{% static 'js/common.js' %}"></script>
+            <script src="{% static 'js/common.js' %}" nonce="{{ nonce_id }}"></script>
         {% endcompress %}
     </body>
 </html>

@@ -190,6 +190,7 @@ class HyperPay(BasePaymentProcessor):
             'locale': request.LANGUAGE_CODE.split('-')[0],
             'csrfmiddlewaretoken': get_token(request),
             'integrity': checkout_data['integrity'],
+            'hyper_pay_api_base_url': self.hyper_pay_api_base_url,
         }
         return transaction_parameters
 
