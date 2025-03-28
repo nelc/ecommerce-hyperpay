@@ -135,14 +135,15 @@ class HyperPay(BasePaymentProcessor):
             basket_data.update(cart_item)
         return basket_data
 
-    def _get_checkout_id(self, basket, request):
+    def _get_checkout_data(self, basket, request):
         """
-        Prepare the checkout and return the checkout ID.
+        Prepare the checkout and return the checkout data.
         """
         checkouts_api_url = self.hyper_pay_api_base_url + self.CHECKOUTS_ENDPOINT
         request_data = {
             'entityId': self.entity_id,
-            'paymentType': self.PAYMENT_TYPE
+            'paymentType': self.PAYMENT_TYPE,
+            'integrity': True,
         }
         if self.test_mode:
             request_data['testMode'] = self.test_mode
@@ -169,15 +170,16 @@ class HyperPay(BasePaymentProcessor):
             raise HyperPayException(
                 'Error creating checkout. HyperPay status code: {}'.format(result_code)
             )
-        return data['id']
+        return data
 
     def get_transaction_parameters(self, basket, request=None, use_client_side_checkout=False, **kwargs):
         """
         Return the transaction parameters needed for this processor.
         """
+        checkout_data = self._get_checkout_data(basket, request)
         payment_widget_js_url = '{}?{}'.format(
             self.hyper_pay_api_base_url + self.PAYMENT_WIDGET_JS_PATH,
-            urlencode({'checkoutId': self._get_checkout_id(basket, request)})
+            urlencode({'checkoutId': checkout_data['id']})
         )
         transaction_parameters = {
             'payment_widget_js': payment_widget_js_url,
@@ -187,6 +189,8 @@ class HyperPay(BasePaymentProcessor):
             'payment_mode': self.PAYMENT_MODE,
             'locale': request.LANGUAGE_CODE.split('-')[0],
             'csrfmiddlewaretoken': get_token(request),
+            'integrity': checkout_data['integrity'],
+            'hyper_pay_api_base_url': self.hyper_pay_api_base_url,
         }
         return transaction_parameters
 

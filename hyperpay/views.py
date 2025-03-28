@@ -7,6 +7,7 @@ import logging
 import re
 from enum import Enum
 from urllib.parse import urlencode
+import uuid
 
 import requests
 from cryptography.fernet import Fernet
@@ -83,7 +84,9 @@ class HyperPayPaymentPageView(View):
         """
         Handles the POST request.
         """
-        return render(request, self.template_name, request.POST.dict())
+        context = request.POST.dict()
+        context["nonce_id"] = str(uuid.uuid4())
+        return render(request, self.template_name, context)
 
 
 class HyperPayResponseView(EdxOrderPlacementMixin, View):
