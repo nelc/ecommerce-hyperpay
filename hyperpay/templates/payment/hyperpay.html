@@ -6,11 +6,11 @@
     <head>
         <meta http-equiv="Content-Security-Policy"
         content="
-        style-src 'self' {{ hyper_pay_api_base_url }} 'unsafe-inline' ;
-        frame-src 'self' {{ hyper_pay_api_base_url }};
-        script-src 'self' {{ hyper_pay_api_base_url }} 'nonce-{{ nonce_id }}' ;
-        connect-src 'self' {{ hyper_pay_api_base_url }};
-        img-src 'self' {{ hyper_pay_api_base_url }};
+        style-src 'self' {{ hyper_pay_api_base_url }} {{ extra_hosts_content_security_policy }} 'unsafe-inline' ;
+        frame-src 'self' {{ hyper_pay_api_base_url }} {{ extra_hosts_content_security_policy }};
+        script-src 'self' {{ hyper_pay_api_base_url }} {{ extra_hosts_content_security_policy }} 'nonce-{{ nonce_id }}' ;
+        connect-src 'self' {{ hyper_pay_api_base_url }} {{ extra_hosts_content_security_policy }};
+        img-src 'self' {{ hyper_pay_api_base_url }} {{ extra_hosts_content_security_policy }};
         ">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
