@@ -191,6 +191,7 @@ class HyperPay(BasePaymentProcessor):
             'csrfmiddlewaretoken': get_token(request),
             'integrity': checkout_data['integrity'],
             'hyper_pay_api_base_url': self.hyper_pay_api_base_url,
+            'extra_hosts_content_security_policy': getattr(settings, 'EXTRA_HOSTS_CONTENT_SECURITY_POLICY', ''),
         }
         return transaction_parameters
 
