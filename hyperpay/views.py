@@ -23,11 +23,10 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
-from oscar.apps.partner import strategy
-from oscar.core.loading import get_class, get_model
-
 from ecommerce.extensions.checkout.mixins import EdxOrderPlacementMixin
 from ecommerce.extensions.checkout.utils import get_receipt_page_url
+from oscar.apps.partner import strategy
+from oscar.core.loading import get_class, get_model
 
 from .processors import HyperPay, HyperPayMada
 
@@ -147,7 +146,7 @@ class HyperPayResponseView(EdxOrderPlacementMixin, View):
             logger.warning(
                 'Received a pending status code %s from HyperPay for payment id %s.',
                 result_code,
-                response_data['id']
+                response_data.get('id', 'id-not-found')
             )
             status = PaymentStatus.PENDING
         elif self.PENDING_NOT_CHANGEABLE_SOON_CODES_REGEX.search(result_code):
@@ -155,21 +154,21 @@ class HyperPayResponseView(EdxOrderPlacementMixin, View):
                 'Received a pending status code %s from HyperPay for payment id %s. As this can change '
                 'after several days, treating it as a failure.',
                 result_code,
-                response_data['id']
+                response_data.get('id', 'id-not-found')
             )
             status = PaymentStatus.FAILURE
         elif self.SUCCESS_CODES_REGEX.search(result_code):
             logger.info(
                 'Received a success status code %s from HyperPay for payment id %s.',
                 result_code,
-                response_data['id']
+                response_data.get('id', 'id-not-found')
             )
         elif self.SUCCESS_MANUAL_REVIEW_CODES_REGEX.search(result_code):
             logger.error(
                 'Received a success status code %s from HyperPay which requires manual verification for payment id %s.'
                 'Treating it as a failed transaction.',
                 result_code,
-                response_data['id']
+                response_data.get('id', 'id-not-found')
             )
 
             # This is a temporary change till we get clarity on whether this should be treated as a failure.
@@ -178,7 +177,7 @@ class HyperPayResponseView(EdxOrderPlacementMixin, View):
             logger.error(
                 'Received a rejection status code %s from HyperPay for payment id %s',
                 result_code,
-                response_data['id']
+                response_data.get('id', 'id-not-found')
             )
             status = PaymentStatus.FAILURE
 
@@ -232,6 +231,26 @@ class HyperPayResponseView(EdxOrderPlacementMixin, View):
             del request.session['hyperpay_dont_check_status']
         return check_status
 
+    def _generate_user_data(self, user):
+        """
+        This extracts the basic user information.
+
+        Args:
+            user <User model>: User instance.
+
+        Returns
+            dictionary: Basic user data.
+        """
+
+        if not user:
+            return {}
+
+        return {
+            "id": user.id,
+            "email": user.email,
+            "username": user.username,
+        }
+
     def get(self, request, encrypted_resource_path=None):
         """
         Handle the response from HyperPay and redirect to the appropriate page based on the status.
@@ -239,9 +258,11 @@ class HyperPayResponseView(EdxOrderPlacementMixin, View):
         if encrypted_resource_path is None:
             self.payment_processor.record_processor_response(request.GET, transaction_id=request.GET.get('id'))
 
-        verification_response = ''
+        verification_response = {}
         basket = None
+        error = None
         transaction_id = 'Unknown'
+        status = PaymentStatus.PENDING
 
         resource_path = self._get_resource_path(request, encrypted_resource_path)
         if resource_path is None:
@@ -251,20 +272,18 @@ class HyperPayResponseView(EdxOrderPlacementMixin, View):
         check_status = self._get_check_status(request)
 
         try:
-            status = PaymentStatus.PENDING
             if check_status:
                 verification_response, status = self._verify_status(resource_path)
-                if (verification_response and isinstance(verification_response, dict) and
-                        verification_response.get('merchantTransactionId')):
-                    transaction_id = verification_response['merchantTransactionId']
+
+            if verification_response and 'merchantMemo' in verification_response:
+                transaction_id = verification_response['merchantMemo']
+                basket_id = OrderNumberGenerator().basket_id(transaction_id)
+                basket = self._get_basket(basket_id)
 
             if status == PaymentStatus.FAILURE:
                 return redirect(reverse('payment_error'))
-            if status == PaymentStatus.PENDING:
+            elif status == PaymentStatus.PENDING:
                 return self._handle_pending_status(request, encrypted_resource_path, resource_path)
-
-            basket_id = OrderNumberGenerator().basket_id(verification_response['merchantMemo'])
-            basket = self._get_basket(basket_id)
 
             transaction_id = verification_response['id']
 
@@ -279,12 +298,22 @@ class HyperPayResponseView(EdxOrderPlacementMixin, View):
                     request.user.username,
                 )
                 raise Http404
+        except Exception as exc:
+            error = exc.__class__.__name__
         finally:
+            verification_response.update({
+                "request_user": self._generate_user_data(request.user),
+                "basket_user": self._generate_user_data(getattr(basket, 'owner', None)),
+                "status": status.name,
+                "error": error,
+            })
+
             payment_processor_response = self.payment_processor.record_processor_response(
                 verification_response,
                 transaction_id=transaction_id,
                 basket=basket
             )
+
         try:
             with transaction.atomic():
                 try:
